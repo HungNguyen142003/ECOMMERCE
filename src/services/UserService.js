@@ -10,14 +10,13 @@ const createUser = (newUser) => {
             const checkUser = await User.findOne({
                 email: email
             })
-            
             if(checkUser !== null){
                 resolve({
                     status: 'OK',
                     message: 'The email is already'
                 })
             }
-            const hash = bcrypt.hashSync(password, 10)
+            const hash = bcrypt.hash(password, 10)
             const createdUser = await User.create({
                 name,    
                 email, 
@@ -39,20 +38,19 @@ const createUser = (newUser) => {
 
 const loginUser = (userLogin) => {
     return new Promise(async (resolve, reject) => {
-        const { name, email, password, confirmPassword, phone } = userLogin
-
+        const { name, email, password, confirmPassword } = userLogin
+        console.log(userLogin)
         try{
             const checkUser = await User.findOne({
                 email: email
             })
-            
             if(checkUser === null){
                 resolve({
                     status: 'OK',
                     message: 'The user is not defined'
                 })
             }
-            const comparePassword = bcrypt.compareSync(password, checkUser.password)
+            const comparePassword = bcrypt.compare(password, checkUser.password)
             console.log('comparaPassword', comparePassword)
 
             if(!comparePassword){
@@ -89,6 +87,7 @@ const updateUser = (id, data) => {
             const checkUser = await User.findOne({
                 _id: id
             })
+            console.log(checkUser);
             if(checkUser === null){
                 resolve({
                     status: 'OK',

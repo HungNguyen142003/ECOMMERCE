@@ -4,10 +4,11 @@ const JwtService = require('../services/JwtService')
 const createUser = async (req, res) => {
     try {
         console.log(req.body)
-        const { name, email, password, confirmPassword, phone } = req.body
+        const { name, email, password, confirmPassword} = req.body
+        // Định nghĩa regex để kiểm tra định dạng email
         const reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
         const isCheckEmail = reg.test(email)
-        if(!name || !email || !password || !confirmPassword || !phone){
+        if(!name || !email || !password || !confirmPassword){
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The input is required'
@@ -36,10 +37,10 @@ const createUser = async (req, res) => {
 const loginUser  = async (req, res) => {
     try {
         console.log(req.body)
-        const { name, email, password, confirmPassword, phone } = req.body
+        const { name, email, password, confirmPassword} = req.body
         const reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
         const isCheckEmail = reg.test(email)
-        if(!name || !email || !password || !confirmPassword || !phone){
+        if(!name || !email || !password || !confirmPassword){
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The input is required'
@@ -69,6 +70,7 @@ const updateUser  = async (req, res) => {
     try {
         const userId = req.params.id
         const data = req.body
+        console.log(data);
         if(!userId){
             return res.status(200).json({
                 status: 'ERR',
