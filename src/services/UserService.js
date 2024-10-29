@@ -5,32 +5,31 @@ const { genneralAccessToken, genneralRefreshToken } = require("./JwtService")
 const createUser = (newUser) => {
     return new Promise(async (resolve, reject) => {
         const { name, email, password, confirmPassword, phone } = newUser
-
-        try{
+        try {
             const checkUser = await User.findOne({
                 email: email
             })
-            if(checkUser !== null){
+            if (checkUser !== null) {
                 resolve({
-                    status: 'OK',
+                    status: 'ERR',
                     message: 'The email is already'
                 })
             }
-            const hash = bcrypt.hash(password, 10)
+            const hash = bcrypt.hashSync(password, 10)
             const createdUser = await User.create({
-                name,    
-                email, 
-                password: hash, 
+                name,
+                email,
+                password: hash,
                 phone
             })
-            if(createdUser){
+            if (createdUser) {
                 resolve({
                     status: 'OK',
                     message: 'SUCCESS',
                     data: createdUser
                 })
             }
-        }catch (e) {
+        } catch (e) {
             reject(e)
         }
     })
@@ -38,24 +37,22 @@ const createUser = (newUser) => {
 
 const loginUser = (userLogin) => {
     return new Promise(async (resolve, reject) => {
-        const { name, email, password, confirmPassword } = userLogin
-        console.log(userLogin)
-        try{
+        const { email, password } = userLogin
+        try {
             const checkUser = await User.findOne({
                 email: email
             })
-            if(checkUser === null){
+            if (checkUser === null) {
                 resolve({
-                    status: 'OK',
+                    status: 'ERR',
                     message: 'The user is not defined'
                 })
             }
-            const comparePassword = bcrypt.compare(password, checkUser.password)
-            console.log('comparaPassword', comparePassword)
+            const comparePassword = bcrypt.compareSync(password, checkUser.password)
 
-            if(!comparePassword){
+            if (!comparePassword) {
                 resolve({
-                    status: 'OK',
+                    status: 'ERR',
                     message: 'The password or user is incorrect'
                 })
             }
@@ -75,7 +72,7 @@ const loginUser = (userLogin) => {
                 access_token,
                 refresh_token
             })
-        }catch (e) {
+        } catch (e) {
             reject(e)
         }
     })
@@ -83,25 +80,24 @@ const loginUser = (userLogin) => {
 
 const updateUser = (id, data) => {
     return new Promise(async (resolve, reject) => {
-        try{
+        try {
             const checkUser = await User.findOne({
                 _id: id
             })
-            console.log(checkUser);
-            if(checkUser === null){
+            if (checkUser === null) {
                 resolve({
-                    status: 'OK',
+                    status: 'ERR',
                     message: 'The user is not defined'
                 })
             }
 
-            const updatedUser = await User.findByIdAndUpdate(id, data, {new: true})
+            const updatedUser = await User.findByIdAndUpdate(id, data, { new: true })
             resolve({
                 status: 'OK',
                 message: 'SUCCESS',
                 data: updatedUser
             })
-        }catch (e) {
+        } catch (e) {
             reject(e)
         }
     })
@@ -109,13 +105,13 @@ const updateUser = (id, data) => {
 
 const deleteUser = (id) => {
     return new Promise(async (resolve, reject) => {
-        try{
+        try {
             const checkUser = await User.findOne({
                 _id: id
             })
-            if(checkUser === null){
+            if (checkUser === null) {
                 resolve({
-                    status: 'OK',
+                    status: 'ERR',
                     message: 'The user is not defined'
                 })
             }
@@ -125,7 +121,22 @@ const deleteUser = (id) => {
                 status: 'OK',
                 message: 'Delete user success',
             })
-        }catch (e) {
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
+const deleteManyUser = (ids) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            await User.deleteMany({ _id: ids })
+            resolve({
+                status: 'OK',
+                message: 'Delete user success',
+            })
+        } catch (e) {
             reject(e)
         }
     })
@@ -133,14 +144,14 @@ const deleteUser = (id) => {
 
 const getAllUser = () => {
     return new Promise(async (resolve, reject) => {
-        try{
-            const allUser = await User.find()
+        try {
+            const allUser = await User.find().sort({createdAt: -1, updatedAt: -1})
             resolve({
                 status: 'OK',
                 message: 'Success',
-                data: allUser 
+                data: allUser
             })
-        }catch (e) {
+        } catch (e) {
             reject(e)
         }
     })
@@ -148,28 +159,26 @@ const getAllUser = () => {
 
 const getDetailsUser = (id) => {
     return new Promise(async (resolve, reject) => {
-        try{
+        try {
             const user = await User.findOne({
                 _id: id
             })
-            if(user === null){
+            if (user === null) {
                 resolve({
-                    status: 'OK',
+                    status: 'ERR',
                     message: 'The user is not defined'
                 })
             }
-
             resolve({
                 status: 'OK',
-                message: 'SUCCESS',
+                message: 'SUCESS',
                 data: user
             })
-        }catch (e) {
+        } catch (e) {
             reject(e)
         }
     })
 }
-
 
 module.exports = {
     createUser,
@@ -177,5 +186,6 @@ module.exports = {
     updateUser,
     deleteUser,
     getAllUser,
-    getDetailsUser
-} 
+    getDetailsUser,
+    deleteManyUser
+}
